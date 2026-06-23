@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+
+    <div class="login-card">
+
+        <div class="logo">
+            <i class="bi bi-hospital"></i>
+        </div>
+
+        <h2 class="title">
+            Hospital Appointment Management System
+        </h2>
+
+        <form method="POST" autocomplete="off">
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Email Address
+                </label>
+
+                <input
+		type="email"
+		name="email"
+		class="form-control"
+		placeholder="Email"	
+		autocomplete="off"
+		required>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Password
+                </label>
+
+                <input
+		type="password"
+		name="password"
+		class="form-control"
+		placeholder="Password"
+		autocomplete="new-password"
+		required>
+
+            </div>
+
+            <button
+		type="submit"
+		class="btn btn-login">
+
+		Login
+
+		</button>
+
+            <div class="links mt-3">
+
+                <a href="/register">
+                    Create Account
+                </a>
+
+                |
+
+                <a href="/forgot-password">
+                    Forgot Password?
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

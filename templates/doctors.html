@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}
+Doctors
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h1 class="welcome-title">
+        Doctors Management
+    </h1>
+
+    <p class="welcome-subtitle">
+        View and Manage Hospital Doctors
+    </p>
+
+    <div class="text-end mb-4">
+
+        <a href="/add_doctor" class="btn btn-login">
+
+            <i class="bi bi-person-plus-fill"></i>
+
+            Add Doctor
+
+        </a>
+
+    </div>
+
+    <div class="dashboard-card">
+
+        <table class="table table-dark table-hover align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Name</th>
+
+                    <th>Department</th>
+
+                    <th>Experience</th>
+
+                    <th>Fee</th>
+
+                    <th>Status</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for doctor in doctors %}
+
+                <tr>
+
+                    <td>{{ doctor[0] }}</td>
+
+                    <td>{{ doctor[1] }}</td>
+
+                    <td>{{ doctor[5] }}</td>
+
+                    <td>{{ doctor[8] }} Years</td>
+
+                    <td>₹{{ doctor[9] }}</td>
+
+                    <td>
+
+                        <span class="badge bg-success">
+
+                            {{ doctor[12] }}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <a href="#"
+                           class="btn btn-warning btn-sm">
+
+                            Edit
+
+                        </a>
+
+                        <a href="#"
+                           class="btn btn-danger btn-sm">
+
+                            Delete
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

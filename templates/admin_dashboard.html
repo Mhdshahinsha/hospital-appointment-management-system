@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Welcome Section -->
+
+    <div class="welcome-container">
+
+        <h1 class="welcome-title">
+            Welcome, {{ session.full_name }}
+        </h1>
+
+        <p class="welcome-subtitle">
+            Administrator Dashboard
+        </p>
+
+    </div>
+
+    <!-- Statistics Cards -->
+
+    <div class="row g-4 mt-4">
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="dashboard-card">
+
+                <h5>Total Doctors</h5>
+
+                <h2>15</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="dashboard-card">
+
+                <h5>Total Patients</h5>
+
+                <h2>250</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="dashboard-card">
+
+                <h5>Appointments</h5>
+
+                <h2>35</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="dashboard-card">
+
+                <h5>Revenue</h5>
+
+                <h2>₹45,000</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Recent Appointments -->
+
+    <div class="dashboard-card mt-5">
+
+        <h3 class="mb-4">
+            Recent Appointments
+        </h3>
+
+        <table class="table table-dark table-hover align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr>
+
+                    <td>Rahul</td>
+                    <td>Dr. John</td>
+                    <td>20-06-2026</td>
+                    <td>10:00 AM</td>
+
+                    <td>
+
+                        <span class="badge bg-success">
+
+                            Confirmed
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Anjali</td>
+                    <td>Dr. Smith</td>
+                    <td>20-06-2026</td>
+                    <td>11:30 AM</td>
+
+                    <td>
+
+                        <span class="badge bg-warning text-dark">
+
+                            Pending
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>Arun</td>
+                    <td>Dr. David</td>
+                    <td>21-06-2026</td>
+                    <td>02:00 PM</td>
+
+                    <td>
+
+                        <span class="badge bg-danger">
+
+                            Cancelled
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Quick Actions -->
+
+    <div class="mt-5">
+
+        <h3 class="text-white mb-4">
+
+            Quick Actions
+
+        </h3>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+
+                <button class="btn btn-login w-100">
+
+                    <i class="bi bi-person-plus-fill"></i>
+
+                    Add Doctor
+
+                </button>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <button class="btn btn-login w-100">
+
+                    <i class="bi bi-people-fill"></i>
+
+                    Add Patient
+
+                </button>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <button class="btn btn-login w-100">
+
+                    <i class="bi bi-calendar-check-fill"></i>
+
+                    Book Appointment
+
+                </button>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <button class="btn btn-login w-100">
+
+                    <i class="bi bi-receipt-cutoff"></i>
+
+                    Generate Bill
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
