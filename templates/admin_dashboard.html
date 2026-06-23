@@ -13,11 +13,15 @@ Admin Dashboard
     <div class="welcome-container">
 
         <h1 class="welcome-title">
+
             Welcome, {{ session.full_name }}
+
         </h1>
 
         <p class="welcome-subtitle">
+
             Administrator Dashboard
+
         </p>
 
     </div>
@@ -66,7 +70,7 @@ Admin Dashboard
 
             <div class="dashboard-card">
 
-                <h5>Revenue</h5>
+                <h5>Total Revenue</h5>
 
                 <h2>₹45,000</h2>
 
@@ -81,7 +85,9 @@ Admin Dashboard
     <div class="dashboard-card mt-5">
 
         <h3 class="mb-4">
+
             Recent Appointments
+
         </h3>
 
         <table class="table table-dark table-hover align-middle">
@@ -167,9 +173,9 @@ Admin Dashboard
 
     <!-- Quick Actions -->
 
-    <div class="mt-5">
+    <div class="dashboard-card mt-5">
 
-        <h3 class="text-white mb-4">
+        <h3 class="mb-4">
 
             Quick Actions
 
@@ -177,51 +183,105 @@ Admin Dashboard
 
         <div class="row g-3">
 
+            <!-- Doctors -->
+
             <div class="col-md-3">
 
-                <button class="btn btn-login w-100">
+                <a href="{{ url_for('doctors') }}"
+                   class="btn btn-login w-100">
 
                     <i class="bi bi-person-plus-fill"></i>
 
-                    Add Doctor
+                    Manage Doctors
 
-                </button>
+                </a>
 
             </div>
 
+            <!-- Patients -->
+
             <div class="col-md-3">
 
-                <button class="btn btn-login w-100">
+                <a href="{{ url_for('patients') }}"
+                   class="btn btn-login w-100">
 
                     <i class="bi bi-people-fill"></i>
 
-                    Add Patient
+                    Manage Patients
 
-                </button>
+                </a>
 
             </div>
 
+            <!-- Appointments -->
+
             <div class="col-md-3">
 
-                <button class="btn btn-login w-100">
+                <a href="#"
+                   class="btn btn-login w-100">
 
                     <i class="bi bi-calendar-check-fill"></i>
 
-                    Book Appointment
+                    Appointments
 
-                </button>
+                </a>
+
+            </div>
+
+            <!-- Bills -->
+
+            <div class="col-md-3">
+
+                <a href="#"
+                   class="btn btn-login w-100">
+
+                    <i class="bi bi-receipt-cutoff"></i>
+
+                    Bills
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- System Management -->
+
+    <div class="dashboard-card mt-5">
+
+        <h3 class="mb-4">
+
+            System Management
+
+        </h3>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+
+                <a href="{{ url_for('register') }}"
+                   class="btn btn-login w-100">
+
+                    <i class="bi bi-person-plus"></i>
+
+                    Create User
+
+                </a>
 
             </div>
 
             <div class="col-md-3">
 
-                <button class="btn btn-login w-100">
+                <a href="{{ url_for('logout') }}"
+                   class="btn btn-danger w-100">
 
-                    <i class="bi bi-receipt-cutoff"></i>
+                    <i class="bi bi-box-arrow-right"></i>
 
-                    Generate Bill
+                    Logout
 
-                </button>
+                </a>
 
             </div>
 

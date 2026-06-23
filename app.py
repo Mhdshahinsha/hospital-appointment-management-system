@@ -121,7 +121,7 @@ def forgot_password():
     return render_template("forget_password.html")
 
 
-@app.route("/admin_dashboard")
+@app.route("/admin")
 def admin_dashboard():
 
     if "user_id" not in session:
@@ -174,6 +174,17 @@ def doctors():
 
     )
 
+@app.route("/doctor")
+def doctor_dashboard():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "Doctor":
+        return redirect(url_for("login"))
+
+    return render_template("doctor_dashboard.html")
+
 @app.route("/add_doctor", methods=["GET", "POST"])
 def add_doctor():
 
@@ -188,6 +199,7 @@ def add_doctor():
         doctor_name = request.form["doctor_name"]
         email = request.form["email"]
         phone = request.form["phone"]
+        password = request.form["password"]
         gender = request.form["gender"]
         department = request.form["department"]
         specialization = request.form["specialization"]
@@ -201,7 +213,49 @@ def add_doctor():
         conn = get_connection()
         cur = conn.cursor()
 
-        cur.execute("""
+        # Check whether email already exists
+        cur.execute(
+            "SELECT * FROM users WHERE email=%s",
+            (email,)
+        )
+
+        if cur.fetchone():
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "add_doctor.html",
+                error="Email already exists."
+            )
+
+        # Insert into users table
+        cur.execute(
+            """
+            INSERT INTO users
+            (
+                full_name,
+                email,
+                phone,
+                password,
+                role
+            )
+
+            VALUES
+            (%s,%s,%s,%s,%s)
+            """,
+            (
+                doctor_name,
+                email,
+                phone,
+                password,
+                "Doctor"
+            )
+        )
+
+        # Insert into doctors table
+        cur.execute(
+            """
             INSERT INTO doctors
             (
                 doctor_name,
@@ -217,23 +271,25 @@ def add_doctor():
                 available_time,
                 status
             )
+
             VALUES
             (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        """,
-        (
-            doctor_name,
-            email,
-            phone,
-            gender,
-            department,
-            specialization,
-            qualification,
-            experience,
-            consultation_fee,
-            available_days,
-            available_time,
-            status
-        ))
+            """,
+            (
+                doctor_name,
+                email,
+                phone,
+                gender,
+                department,
+                specialization,
+                qualification,
+                experience,
+                consultation_fee,
+                available_days,
+                available_time,
+                status
+            )
+        )
 
         conn.commit()
 
@@ -244,7 +300,6 @@ def add_doctor():
 
     return render_template("add_doctor.html")
 
-
 @app.route("/patient")
 def patient_dashboard():
 
@@ -254,6 +309,7 @@ def patient_dashboard():
 
     if session["role"] != "Patient":
 
+
         return redirect(url_for("login"))
 
     return render_template(
@@ -261,6 +317,53 @@ def patient_dashboard():
         name=session["full_name"]
     )
 
+@app.route("/patients")
+def patients():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM users
+        WHERE role='Patient'
+        ORDER BY user_id
+    """)
+
+    patients = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "patients.html",
+        patients=patients
+    )
+
+@app.route("/appointments")
+def appointments():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    return render_template("appointments.html")
+
+
+@app.route("/bills")
+def bills():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    return render_template("bills.html")
+
+ 
 @app.route("/logout")
 def logout():
 

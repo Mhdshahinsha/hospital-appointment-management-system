@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-Doctor Dashboard
+Patient Dashboard
 {% endblock %}
 
 {% block content %}
@@ -13,11 +13,15 @@ Doctor Dashboard
     <div class="welcome-container">
 
         <h1 class="welcome-title">
-            Welcome, Dr. {{ session.full_name }}
+
+            Welcome, {{ session.full_name }}
+
         </h1>
 
         <p class="welcome-subtitle">
-            Doctor Dashboard
+
+            Patient Dashboard
+
         </p>
 
     </div>
@@ -30,21 +34,9 @@ Doctor Dashboard
 
             <div class="dashboard-card">
 
-                <h5>Today's Appointments</h5>
+                <h5>Appointments</h5>
 
-                <h2>8</h2>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="dashboard-card">
-
-                <h5>My Patients</h5>
-
-                <h2>145</h2>
+                <h2>3</h2>
 
             </div>
 
@@ -54,7 +46,19 @@ Doctor Dashboard
 
             <div class="dashboard-card">
 
-                <h5>Pending Cases</h5>
+                <h5>Upcoming Visits</h5>
+
+                <h2>1</h2>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+
+            <div class="dashboard-card">
+
+                <h5>Medical Records</h5>
 
                 <h2>5</h2>
 
@@ -66,9 +70,9 @@ Doctor Dashboard
 
             <div class="dashboard-card">
 
-                <h5>Completed Today</h5>
+                <h5>Pending Bills</h5>
 
-                <h2>3</h2>
+                <h2>₹1,500</h2>
 
             </div>
 
@@ -76,27 +80,27 @@ Doctor Dashboard
 
     </div>
 
-    <!-- Today's Appointments -->
+    <!-- Appointment Table -->
 
     <div class="dashboard-card mt-5">
 
         <h3 class="mb-4">
 
-            Today's Appointments
+            My Appointments
 
         </h3>
 
-        <table class="table table-dark table-hover">
+        <table class="table table-dark table-hover align-middle">
 
             <thead>
 
                 <tr>
 
-                    <th>Patient</th>
+                    <th>Doctor</th>
+
+                    <th>Date</th>
 
                     <th>Time</th>
-
-                    <th>Reason</th>
 
                     <th>Status</th>
 
@@ -108,37 +112,17 @@ Doctor Dashboard
 
                 <tr>
 
-                    <td>Rahul</td>
+                    <td>Dr. John</td>
+
+                    <td>25-06-2026</td>
 
                     <td>10:00 AM</td>
-
-                    <td>Fever</td>
-
-                    <td>
-
-                        <span class="badge bg-warning text-dark">
-
-                            Waiting
-
-                        </span>
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <td>Anjali</td>
-
-                    <td>11:30 AM</td>
-
-                    <td>Headache</td>
 
                     <td>
 
                         <span class="badge bg-success">
 
-                            Completed
+                            Confirmed
 
                         </span>
 
@@ -148,17 +132,17 @@ Doctor Dashboard
 
                 <tr>
 
-                    <td>Arun</td>
+                    <td>Dr. Smith</td>
 
-                    <td>02:00 PM</td>
+                    <td>30-06-2026</td>
 
-                    <td>General Checkup</td>
+                    <td>11:30 AM</td>
 
                     <td>
 
                         <span class="badge bg-warning text-dark">
 
-                            Waiting
+                            Pending
 
                         </span>
 
@@ -188,21 +172,9 @@ Doctor Dashboard
 
                 <button class="btn btn-login w-100">
 
-                    <i class="bi bi-calendar-check-fill"></i>
+                    <i class="bi bi-calendar-plus-fill"></i>
 
-                    View Appointments
-
-                </button>
-
-            </div>
-
-            <div class="col-md-3">
-
-                <button class="btn btn-login w-100">
-
-                    <i class="bi bi-person-lines-fill"></i>
-
-                    My Patients
+                    Book Appointment
 
                 </button>
 
@@ -212,9 +184,21 @@ Doctor Dashboard
 
                 <button class="btn btn-login w-100">
 
-                    <i class="bi bi-clock-history"></i>
+                    <i class="bi bi-file-medical-fill"></i>
 
-                    My Schedule
+                    Medical Records
+
+                </button>
+
+            </div>
+
+            <div class="col-md-3">
+
+                <button class="btn btn-login w-100">
+
+                    <i class="bi bi-receipt-cutoff"></i>
+
+                    My Bills
 
                 </button>
 
@@ -238,4 +222,5 @@ Doctor Dashboard
 
 </div>
 
-{% endblock %}
+{% endblock %}o
+
