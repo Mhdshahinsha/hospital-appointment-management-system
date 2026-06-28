@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session
 from db import get_connection
 
@@ -35,6 +36,27 @@ def login():
             session["email"] = user[2]
             session["role"] = user[5]
 
+            # Store patient_id in session
+            if session["role"] == "Patient":
+
+                conn = get_connection()
+                cur = conn.cursor()
+
+                cur.execute("""
+                    SELECT patient_id
+                    FROM patients
+                    WHERE email=%s
+                """, (session["email"],))
+
+                patient = cur.fetchone()
+
+                if patient:
+                    session["patient_id"] = patient[0]
+
+                cur.close()
+                conn.close()
+
+            # Redirect according to role
             if session["role"] == "Admin":
                 return redirect(url_for("admin_dashboard"))
 
@@ -53,67 +75,8 @@ def login():
 
     return render_template("login.html")
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-
-    if request.method == "POST":
-
-        full_name = request.form["full_name"]
-        email = request.form["email"]
-        phone = request.form["phone"]
-        password = request.form["password"]
-        role = request.form["role"]
-
-        conn = get_connection()
-        cur = conn.cursor()
-
-        cur.execute(
-            "SELECT * FROM users WHERE email=%s",
-            (email,)
-        )
-
-        existing_user = cur.fetchone()
-
-        if existing_user:
-
-            cur.close()
-            conn.close()
-
-            return render_template(
-                "register.html",
-                error="Email already exists."
-            )
-
-        cur.execute("""
-            INSERT INTO users
-            (
-                full_name,
-                email,
-                phone,
-                password,
-                role
-            )
-
-            VALUES
-            (%s,%s,%s,%s,%s)
-
-        """,
-        (
-            full_name,
-            email,
-            phone,
-            password,
-            role
-        ))
-
-        conn.commit()
-
-        cur.close()
-        conn.close()
-
-        return redirect(url_for("login"))
-
     return render_template("register.html")
+
 
 @app.route("/forgot-password")
 def forgot_password():
@@ -124,18 +87,101 @@ def forgot_password():
 @app.route("/admin")
 def admin_dashboard():
 
+    # Check Login
     if "user_id" not in session:
-
         return redirect(url_for("login"))
 
+    # Only Admin
     if session["role"] != "Admin":
-
         return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # -------------------------
+    # Total Doctors
+    # -------------------------
+
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM doctors
+    """)
+    doctor_count = cur.fetchone()[0]
+
+    # -------------------------
+    # Total Patients
+    # -------------------------
+
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM patients
+    """)
+    patient_count = cur.fetchone()[0]
+
+    # -------------------------
+    # Total Appointments
+    # -------------------------
+
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM appointments
+    """)
+    appointment_count = cur.fetchone()[0]
+
+    # -------------------------
+    # Total Revenue
+    # (Temporary)
+    # -------------------------
+
+    total_revenue = 0
+
+    # -------------------------
+    # Recent Appointments
+    # -------------------------
+
+    cur.execute("""
+        SELECT
+            p.full_name,
+            d.doctor_name,
+            a.appointment_date,
+            a.appointment_time,
+            a.status
+
+        FROM appointments a
+
+        JOIN patients p
+            ON a.patient_id = p.patient_id
+
+        JOIN doctors d
+            ON a.doctor_id = d.doctor_id
+
+        ORDER BY
+            a.created_at DESC
+
+        LIMIT 5
+    """)
+
+    recent_appointments = cur.fetchall()
+
+    cur.close()
+    conn.close()
 
     return render_template(
         "admin_dashboard.html",
-        name=session["full_name"]
+
+        name=session["full_name"],
+
+        doctor_count=doctor_count,
+
+        patient_count=patient_count,
+
+        appointment_count=appointment_count,
+
+        total_revenue=total_revenue,
+
+        recent_appointments=recent_appointments
     )
+
 
 @app.route("/doctors")
 def doctors():
@@ -206,8 +252,15 @@ def add_doctor():
         qualification = request.form["qualification"]
         experience = request.form["experience"]
         consultation_fee = request.form["consultation_fee"]
-        available_days = request.form["available_days"]
-        available_time = request.form["available_time"]
+        available_days = ",".join(
+        request.form.getlist("available_days")
+        )
+
+        start_time = request.form["start_time"]
+
+        end_time = request.form["end_time"]
+
+        available_time = f"{start_time}-{end_time}"    
         status = request.form["status"]
 
         conn = get_connection()
@@ -322,8 +375,14 @@ def edit_doctor(doctor_id):
         qualification = request.form["qualification"]
         experience = request.form["experience"]
         consultation_fee = request.form["consultation_fee"]
-        available_days = request.form["available_days"]
-        available_time = request.form["available_time"]
+        available_days = ",".join(
+    	request.form.getlist("available_days")
+	)
+
+        start_time = request.form["start_time"]
+        end_time = request.form["end_time"]
+
+        available_time = f"{start_time}-{end_time}"
         status = request.form["status"]
 
         # Get doctor's email
@@ -445,23 +504,71 @@ def delete_doctor(doctor_id):
 
     return redirect(url_for("doctors"))
 
-
 @app.route("/patient")
 def patient_dashboard():
 
     if "user_id" not in session:
-
         return redirect(url_for("login"))
 
     if session["role"] != "Patient":
-
-
         return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    patient_id = session["patient_id"]
+
+    # Total Appointments
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM appointments
+        WHERE patient_id=%s
+    """, (patient_id,))
+    appointment_count = cur.fetchone()[0]
+
+    # Upcoming Visits
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM appointments
+        WHERE patient_id=%s
+        AND appointment_date >= CURRENT_DATE
+    """, (patient_id,))
+    upcoming_visits = cur.fetchone()[0]
+
+    # Recent Appointments
+    cur.execute("""
+        SELECT
+            d.doctor_name,
+            a.appointment_date,
+            a.appointment_time,
+            a.status
+
+        FROM appointments a
+
+        JOIN doctors d
+        ON a.doctor_id = d.doctor_id
+
+        WHERE a.patient_id=%s
+
+        ORDER BY
+            a.appointment_date DESC,
+            a.appointment_time DESC
+
+        LIMIT 5
+    """, (patient_id,))
+
+    appointments = cur.fetchall()
+
+    cur.close()
+    conn.close()
 
     return render_template(
         "patient_dashboard.html",
-        name=session["full_name"]
+        appointment_count=appointment_count,
+        upcoming_visits=upcoming_visits,
+        appointments=appointments
     )
+
 
 @app.route("/patients")
 def patients():
@@ -547,7 +654,7 @@ def add_patient():
             conn.close()
 
             return render_template(
-                "add_patient.html",
+                "add_patients.html",
                 error="Email already exists."
             )
 
@@ -708,7 +815,7 @@ def edit_patient(patient_id):
         return redirect(url_for("patients"))
 
     return render_template(
-        "edit_patient.html",
+        "edit_patients.html",
         patient=patient
     )
 
@@ -762,7 +869,374 @@ def appointments():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    return render_template("appointments.html")
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            a.appointment_id,
+            p.full_name,
+            d.doctor_name,
+            a.appointment_date,
+            a.appointment_time,
+            a.reason,
+            a.status
+
+        FROM appointments a
+
+        JOIN patients p
+            ON a.patient_id = p.patient_id
+
+        JOIN doctors d
+            ON a.doctor_id = d.doctor_id
+
+        ORDER BY a.appointment_date,
+                 a.appointment_time
+    """)
+
+    appointments = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "appointments.html",
+        appointments=appointments
+    )
+
+@app.route("/add_appointment", methods=["GET", "POST"])
+def add_appointment():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # Load Patients
+    cur.execute("""
+        SELECT patient_id, full_name
+        FROM patients
+        ORDER BY full_name
+    """)
+    patients = cur.fetchall()
+
+    # Load Doctors
+    cur.execute("""
+        SELECT doctor_id, doctor_name
+        FROM doctors
+        ORDER BY doctor_name
+    """)
+    doctors = cur.fetchall()
+
+    if request.method == "POST":
+
+        patient_id = request.form["patient_id"]
+        doctor_id = request.form["doctor_id"]
+        appointment_date = request.form["appointment_date"]
+        appointment_time = request.form["appointment_time"]
+        reason = request.form["reason"]
+        status = request.form["status"]
+
+        # ---------------------------------
+        # Get Doctor Availability
+        # ---------------------------------
+
+        cur.execute("""
+            SELECT
+                available_days,
+                available_time
+            FROM doctors
+            WHERE doctor_id=%s
+        """, (doctor_id,))
+
+        doctor = cur.fetchone()
+
+        if doctor is None:
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "add_appointment.html",
+                patients=patients,
+                doctors=doctors,
+                error="Doctor not found."
+            )
+
+        available_days = doctor[0]
+        available_time = doctor[1]
+
+        # ---------------------------------
+        # Check Doctor Working Day
+        # ---------------------------------
+
+        appointment_day = datetime.strptime(
+            appointment_date,
+            "%Y-%m-%d"
+        ).strftime("%A")
+
+        days_list = [
+            day.strip()
+            for day in available_days.split(",")
+        ]
+
+        if appointment_day not in days_list:
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "add_appointment.html",
+                patients=patients,
+                doctors=doctors,
+                error=f"Doctor is not available on {appointment_day}."
+            )
+
+        # ---------------------------------
+        # Check Doctor Working Time
+        # ---------------------------------
+
+        start_time, end_time = available_time.split("-")
+
+        if appointment_time < start_time or appointment_time > end_time:
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "add_appointment.html",
+                patients=patients,
+                doctors=doctors,
+                error=f"Doctor is available only between {start_time} and {end_time}."
+            )
+
+        # ---------------------------------
+        # Check Duplicate Appointment
+        # ---------------------------------
+
+        cur.execute("""
+            SELECT appointment_id
+            FROM appointments
+            WHERE doctor_id=%s
+            AND appointment_date=%s
+            AND appointment_time=%s
+        """,
+        (
+            doctor_id,
+            appointment_date,
+            appointment_time
+        ))
+
+        existing = cur.fetchone()
+
+        if existing:
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "add_appointment.html",
+                patients=patients,
+                doctors=doctors,
+                error="This doctor already has an appointment at the selected date and time."
+            )
+
+        # ---------------------------------
+        # Insert Appointment
+        # ---------------------------------
+
+        cur.execute("""
+            INSERT INTO appointments
+            (
+                patient_id,
+                doctor_id,
+                appointment_date,
+                appointment_time,
+                reason,
+                status
+            )
+            VALUES
+            (%s,%s,%s,%s,%s,%s)
+        """,
+        (
+            patient_id,
+            doctor_id,
+            appointment_date,
+            appointment_time,
+            reason,
+            status
+        ))
+
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return redirect(url_for("appointments"))
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "add_appointment.html",
+        patients=patients,
+        doctors=doctors
+    )
+
+
+@app.route("/edit_appointment/<int:appointment_id>", methods=["GET", "POST"])
+def edit_appointment(appointment_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # Load Patients
+    cur.execute("""
+        SELECT patient_id, full_name
+        FROM patients
+        ORDER BY full_name
+    """)
+    patients = cur.fetchall()
+
+    # Load Doctors
+    cur.execute("""
+        SELECT doctor_id, doctor_name
+        FROM doctors
+        ORDER BY doctor_name
+    """)
+    doctors = cur.fetchall()
+
+    # Load Current Appointment
+    cur.execute("""
+        SELECT *
+        FROM appointments
+        WHERE appointment_id=%s
+    """, (appointment_id,))
+
+    appointment = cur.fetchone()
+
+    if not appointment:
+        cur.close()
+        conn.close()
+        return redirect(url_for("appointments"))
+
+    if request.method == "POST":
+
+        patient_id = request.form["patient_id"]
+        doctor_id = request.form["doctor_id"]
+        appointment_date = request.form["appointment_date"]
+        appointment_time = request.form["appointment_time"]
+        reason = request.form["reason"]
+        status = request.form["status"]
+
+        # Check Duplicate Appointment
+        cur.execute("""
+            SELECT appointment_id
+            FROM appointments
+            WHERE doctor_id=%s
+            AND appointment_date=%s
+            AND appointment_time=%s
+            AND appointment_id<>%s
+        """,
+        (
+            doctor_id,
+            appointment_date,
+            appointment_time,
+            appointment_id
+        ))
+
+        existing = cur.fetchone()
+
+        if existing:
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "edit_appointment.html",
+                appointment=appointment,
+                patients=patients,
+                doctors=doctors,
+                error="This doctor already has an appointment at the selected date and time."
+            )
+
+        # Update Appointment
+        cur.execute("""
+            UPDATE appointments
+            SET
+                patient_id=%s,
+                doctor_id=%s,
+                appointment_date=%s,
+                appointment_time=%s,
+                reason=%s,
+                status=%s
+            WHERE appointment_id=%s
+        """,
+        (
+            patient_id,
+            doctor_id,
+            appointment_date,
+            appointment_time,
+            reason,
+            status,
+            appointment_id
+        ))
+
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return redirect(url_for("appointments"))
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "edit_appointment.html",
+        appointment=appointment,
+        patients=patients,
+        doctors=doctors
+    )
+
+
+
+@app.route("/delete_appointment/<int:appointment_id>")
+def delete_appointment(appointment_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM appointments
+        WHERE appointment_id = %s
+    """, (appointment_id,))
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return redirect(url_for("appointments"))
 
 
 @app.route("/bills")

@@ -36,7 +36,7 @@ Patient Dashboard
 
                 <h5>Appointments</h5>
 
-                <h2>3</h2>
+                <h2>{{ appointment_count }}</h2>
 
             </div>
 
@@ -48,7 +48,7 @@ Patient Dashboard
 
                 <h5>Upcoming Visits</h5>
 
-                <h2>1</h2>
+                <h2>{{ upcoming_visits }}</h2>
 
             </div>
 
@@ -89,7 +89,8 @@ Patient Dashboard
             My Appointments
 
         </h3>
-
+          
+       <div class="appointment-table-scroll">
         <table class="table table-dark table-hover align-middle">
 
             <thead>
@@ -108,117 +109,140 @@ Patient Dashboard
 
             </thead>
 
-            <tbody>
+<tbody>
 
-                <tr>
+{% if appointments %}
 
-                    <td>Dr. John</td>
+    {% for appointment in appointments %}
 
-                    <td>25-06-2026</td>
+    <tr>
 
-                    <td>10:00 AM</td>
+        <td>{{ appointment[0] }}</td>
 
-                    <td>
+        <td>{{ appointment[1] }}</td>
 
-                        <span class="badge bg-success">
+        <td>{{ appointment[2] }}</td>
 
-                            Confirmed
+        <td>
 
-                        </span>
+            {% if appointment[3] == "Confirmed" %}
 
-                    </td>
+                <span class="badge bg-success">
 
-                </tr>
+                    {{ appointment[3] }}
 
-                <tr>
+                </span>
 
-                    <td>Dr. Smith</td>
+            {% elif appointment[3] == "Pending" %}
 
-                    <td>30-06-2026</td>
+                <span class="badge bg-warning text-dark">
 
-                    <td>11:30 AM</td>
+                    {{ appointment[3] }}
 
-                    <td>
+                </span>
 
-                        <span class="badge bg-warning text-dark">
+            {% elif appointment[3] == "Cancelled" %}
 
-                            Pending
+                <span class="badge bg-danger">
 
-                        </span>
+                    {{ appointment[3] }}
 
-                    </td>
+                </span>
 
-                </tr>
+            {% elif appointment[3] == "Completed" %}
 
-            </tbody>
+                <span class="badge bg-primary">
 
+                    {{ appointment[3] }}
+
+                </span>
+
+            {% else %}
+
+                <span class="badge bg-secondary">
+
+                    {{ appointment[3] }}
+
+                </span>
+
+            {% endif %}
+
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+{% else %}
+
+<tr>
+
+    <td colspan="4" class="text-center text-white">
+
+        No Appointments Found
+
+    </td>
+
+</tr>
+
+{% endif %}
+
+</tbody>
         </table>
 
     </div>
+</div>
 
-    <!-- Quick Actions -->
+<!-- Quick Actions -->
 
-    <div class="mt-5">
+<div class="mt-5">
 
-        <h3 class="text-white mb-4">
+    <h3 class="text-white mb-4">
+        Quick Actions
+    </h3>
 
-            Quick Actions
+    <div class="row">
 
-        </h3>
+        <div class="col-md-4 mb-3">
 
-        <div class="row g-3">
+            <button class="btn btn-login w-100">
 
-            <div class="col-md-3">
+                <i class="bi bi-file-medical-fill"></i>
 
-                <button class="btn btn-login w-100">
+                Medical Records
 
-                    <i class="bi bi-calendar-plus-fill"></i>
+            </button>
 
-                    Book Appointment
+        </div>
 
-                </button>
+        <div class="col-md-4 mb-3">
 
-            </div>
+            <button class="btn btn-login w-100">
 
-            <div class="col-md-3">
+                <i class="bi bi-receipt-cutoff"></i>
 
-                <button class="btn btn-login w-100">
+                My Bills
 
-                    <i class="bi bi-file-medical-fill"></i>
+            </button>
 
-                    Medical Records
+        </div>
 
-                </button>
+        <div class="col-md-4 mb-3">
 
-            </div>
+            <a href="{{ url_for('logout') }}"
+               class="btn btn-login w-100">
 
-            <div class="col-md-3">
+                <i class="bi bi-box-arrow-right"></i>
 
-                <button class="btn btn-login w-100">
+                Logout
 
-                    <i class="bi bi-receipt-cutoff"></i>
-
-                    My Bills
-
-                </button>
-
-            </div>
-
-            <div class="col-md-3">
-
-                <a href="{{ url_for('logout') }}" class="btn btn-login w-100">
-
-                    <i class="bi bi-box-arrow-right"></i>
-
-                    Logout
-
-                </a>
-
-            </div>
+            </a>
 
         </div>
 
     </div>
+
+</div>
 
 </div>
 

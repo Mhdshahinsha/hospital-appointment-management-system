@@ -320,6 +320,74 @@ select.form-control{
     color:#e5e7eb !important;
 }
 
+/* ==============================
+   Appointment Table Scroll
+============================== */
+
+.appointment-table-scroll{
+
+    max-height:350px;
+
+    overflow-y:auto;
+
+    overflow-x:hidden;
+
+}
+/* Available Days Container */
+
+.days-container{
+
+    background: rgba(255,255,255,0.95);
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    border: 1px solid #ddd;
+
+    max-height: 220px;
+
+    overflow-y: auto;
+
+}
+
+/* Each Day */
+
+.days-container .form-check{
+
+    padding: 10px 12px;
+
+    border-bottom: 1px solid #e5e5e5;
+
+}
+
+.days-container .form-check:last-child{
+
+    border-bottom: none;
+
+}
+
+/* Checkbox */
+
+.days-container .form-check-input{
+
+    margin-right: 10px;
+
+    transform: scale(1.2);
+
+}
+
+/* Day Text */
+
+.days-container .form-check-label{
+
+    color: #000;
+
+    font-weight: 500;
+
+    cursor: pointer;
+
+}
 
 .center-page{
 

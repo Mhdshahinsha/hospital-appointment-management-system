@@ -36,7 +36,7 @@ Admin Dashboard
 
                 <h5>Total Doctors</h5>
 
-                <h2>15</h2>
+                <h2>{{ doctor_count }}</h2>
 
             </div>
 
@@ -48,7 +48,7 @@ Admin Dashboard
 
                 <h5>Total Patients</h5>
 
-                <h2>250</h2>
+                <h2>{{ patient_count }}</h2>
 
             </div>
 
@@ -60,7 +60,7 @@ Admin Dashboard
 
                 <h5>Appointments</h5>
 
-                <h2>35</h2>
+                <h2>{{ appointment_count }}</h2>
 
             </div>
 
@@ -72,7 +72,7 @@ Admin Dashboard
 
                 <h5>Total Revenue</h5>
 
-                <h2>₹45,000</h2>
+                <h2>{{ total_revenue }}</h2>
 
             </div>
 
@@ -106,66 +106,79 @@ Admin Dashboard
 
             </thead>
 
-            <tbody>
+<tbody>
 
-                <tr>
+{% if recent_appointments %}
 
-                    <td>Rahul</td>
-                    <td>Dr. John</td>
-                    <td>20-06-2026</td>
-                    <td>10:00 AM</td>
+    {% for appointment in recent_appointments %}
 
-                    <td>
+    <tr>
 
-                        <span class="badge bg-success">
+        <td>{{ appointment[0] }}</td>
 
-                            Confirmed
+        <td>{{ appointment[1] }}</td>
 
-                        </span>
+        <td>{{ appointment[2] }}</td>
 
-                    </td>
+        <td>{{ appointment[3] }}</td>
 
-                </tr>
+        <td>
 
-                <tr>
+            {% if appointment[4] == "Confirmed" %}
 
-                    <td>Anjali</td>
-                    <td>Dr. Smith</td>
-                    <td>20-06-2026</td>
-                    <td>11:30 AM</td>
+                <span class="badge bg-success">
 
-                    <td>
+                    {{ appointment[4] }}
 
-                        <span class="badge bg-warning text-dark">
+                </span>
 
-                            Pending
+            {% elif appointment[4] == "Pending" %}
 
-                        </span>
+                <span class="badge bg-warning text-dark">
 
-                    </td>
+                    {{ appointment[4] }}
 
-                </tr>
+                </span>
 
-                <tr>
+            {% elif appointment[4] == "Cancelled" %}
 
-                    <td>Arun</td>
-                    <td>Dr. David</td>
-                    <td>21-06-2026</td>
-                    <td>02:00 PM</td>
+                <span class="badge bg-danger">
 
-                    <td>
+                    {{ appointment[4] }}
 
-                        <span class="badge bg-danger">
+                </span>
 
-                            Cancelled
+            {% else %}
 
-                        </span>
+                <span class="badge bg-secondary">
 
-                    </td>
+                    {{ appointment[4] }}
 
-                </tr>
+                </span>
 
-            </tbody>
+            {% endif %}
+
+        </td>
+
+    </tr>
+
+    {% endfor %}
+
+{% else %}
+
+<tr>
+
+    <td colspan="5" class="text-center">
+
+        No Recent Appointments
+
+    </td>
+
+</tr>
+
+{% endif %}
+
+</tbody>
 
         </table>
 
@@ -217,15 +230,14 @@ Admin Dashboard
 
             <div class="col-md-3">
 
-                <a href="#"
-                   class="btn btn-login w-100">
+	     <a href="{{ url_for('appointments') }}"
+  	     class="btn btn-login w-100">
 
-                    <i class="bi bi-calendar-check-fill"></i>
+   	     <i class="bi bi-calendar-check-fill"></i>
 
-                    Appointments
+   	     Manage Appointments
 
-                </a>
-
+	    </a>
             </div>
 
             <!-- Bills -->
@@ -257,22 +269,7 @@ Admin Dashboard
 
         </h3>
 
-        <div class="row g-3">
-
-            <div class="col-md-3">
-
-                <a href="{{ url_for('register') }}"
-                   class="btn btn-login w-100">
-
-                    <i class="bi bi-person-plus"></i>
-
-                    Create User
-
-                </a>
-
-            </div>
-
-            <div class="col-md-3">
+            <div class="col-md-4">
 
                 <a href="{{ url_for('logout') }}"
                    class="btn btn-danger w-100">

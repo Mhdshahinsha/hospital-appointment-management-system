@@ -88,3 +88,48 @@ if (patientSearch) {
 }
 
 });
+
+// =============================
+// Live Appointment Search
+// =============================
+
+const appointmentSearch = document.getElementById("appointmentSearch");
+
+if (appointmentSearch) {
+
+    appointmentSearch.addEventListener("keyup", function () {
+
+        const value = this.value.toLowerCase();
+
+        const rows = document.querySelectorAll(".appointment-row");
+
+        const noAppointmentRow = document.getElementById("noAppointmentRow");
+
+        let found = false;
+
+        rows.forEach(function (row) {
+
+            const text = row.innerText.toLowerCase();
+
+            if (text.includes(value)) {
+
+                row.style.display = "";
+                found = true;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+        if (noAppointmentRow) {
+
+            noAppointmentRow.style.display = found ? "none" : "";
+
+        }
+
+    });
+
+}

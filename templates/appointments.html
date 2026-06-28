@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}
+Appointments Management
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Heading -->
+
+    <div class="welcome-container">
+
+        <h1 class="welcome-title">
+
+            Appointments Management
+
+        </h1>
+
+        <p class="welcome-subtitle">
+
+            View and Manage Hospital Appointments
+
+        </p>
+
+    </div>
+
+    <!-- Search + Add Appointment -->
+
+    <div class="row mb-4 align-items-center">
+
+        <div class="col-md-8">
+
+            <input
+                type="text"
+                id="appointmentSearch"
+                class="form-control"
+                placeholder="🔍 Search Appointment...">
+
+        </div>
+
+        <div class="col-md-4">
+
+            <a href="{{ url_for('add_appointment') }}"
+               class="btn btn-login w-100">
+
+                <i class="bi bi-calendar-plus-fill"></i>
+
+                Add Appointment
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- Appointment Table -->
+
+    <div class="dashboard-card">
+
+        <table
+            class="table table-dark table-hover align-middle">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for appointment in appointments %}
+
+                <tr class="appointment-row">
+
+                    <td>{{ appointment[0] }}</td>
+
+                    <td>{{ appointment[1] }}</td>
+
+                    <td>{{ appointment[2] }}</td>
+
+                    <td>{{ appointment[3] }}</td>
+
+                    <td>{{ appointment[4] }}</td>
+
+                    <td>{{ appointment[5] }}</td>
+
+                    <td>
+
+                        {% if appointment[6] == "Pending" %}
+
+                            <span class="badge bg-warning text-dark">
+
+                                Pending
+
+                            </span>
+
+                        {% elif appointment[6] == "Confirmed" %}
+
+                            <span class="badge bg-success">
+
+                                Confirmed
+
+                            </span>
+
+                        {% elif appointment[6] == "Completed" %}
+
+                            <span class="badge bg-primary">
+
+                                Completed
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-danger">
+
+                                Cancelled
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <a href="{{ url_for('edit_appointment', appointment_id=appointment[0]) }}"
+                           class="btn btn-warning btn-sm">
+
+                            <i class="bi bi-pencil-square"></i>
+
+                            Edit
+
+                        </a>
+
+                        <a href="{{ url_for('delete_appointment', appointment_id=appointment[0]) }}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('Are you sure you want to delete this appointment?');">
+
+                            <i class="bi bi-trash-fill"></i>
+
+                            Delete
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+                <tr id="noAppointmentRow" style="display:none;">
+
+                    <td colspan="8" class="text-center text-white">
+
+                        No Appointments Found.
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
