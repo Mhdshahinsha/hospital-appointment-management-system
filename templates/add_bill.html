@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}
+Generate Bill
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="welcome-container">
+
+        <h1 class="welcome-title">
+
+            Generate Bill
+
+        </h1>
+
+        <p class="welcome-subtitle">
+
+            Create Patient Bill
+
+        </p>
+
+    </div>
+
+    <div class="d-flex justify-content-center">
+
+        <div class="add-doctor-card">
+         
+        {% if error %}
+
+<div class="alert alert-danger">
+
+    {{ error }}
+
+</div>
+
+{% endif %}
+            <form method="POST">
+
+                <div class="row">
+
+                    <!-- Appointment ID -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Appointment ID
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ bill[0] }}"
+                            readonly>
+
+                    </div>
+
+                    <!-- Patient -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Patient
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ bill[2] }}"
+                            readonly>
+
+                    </div>
+
+                    <!-- Doctor -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Doctor
+
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ bill[4] }}"
+                            readonly>
+
+                    </div>
+
+                    <!-- Consultation Fee -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Consultation Fee
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="consultation_fee"
+                            name="consultation_fee"
+                            class="form-control"
+                            value="{{ bill[5] }}"
+                            readonly>
+
+                    </div>
+
+                    <!-- Medicine -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Medicine Charge
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="medicine_charge"
+                            name="medicine_charge"
+                            class="form-control"
+                            value="0">
+
+                    </div>
+
+                    <!-- Lab -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Lab Charge
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="lab_charge"
+                            name="lab_charge"
+                            class="form-control"
+                            value="0">
+
+                    </div>
+
+                    <!-- Other -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Other Charge
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="other_charge"
+                            name="other_charge"
+                            class="form-control"
+                            value="0">
+
+                    </div>
+
+                    <!-- Discount -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+
+                            Discount
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="discount"
+                            name="discount"
+                            class="form-control"
+                            value="0">
+
+                    </div>
+
+                    <!-- Total -->
+
+                    <div class="col-md-6 mb-4">
+
+                        <label class="form-label">
+
+                            Total Amount
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="total_amount"
+                            name="total_amount"
+                            class="form-control"
+                            readonly>
+
+                    </div>
+
+                    <!-- Payment Status -->
+
+                    <div class="col-md-6 mb-4">
+
+                        <label class="form-label">
+
+                            Payment Status
+
+                        </label>
+
+                        <select
+                            class="form-control"
+                            name="payment_status">
+
+                            <option>
+
+                                Pending
+
+                            </option>
+
+                            <option>
+
+                                Paid
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="text-center">
+
+                    <button
+                        type="submit"
+                        class="btn btn-add-login px-5">
+
+                        <i class="bi bi-receipt"></i>
+
+                        Generate Bill
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function calculateTotal(){
+
+let consultation =
+parseFloat(document.getElementById("consultation_fee").value)||0;
+
+let medicine =
+parseFloat(document.getElementById("medicine_charge").value)||0;
+
+let lab =
+parseFloat(document.getElementById("lab_charge").value)||0;
+
+let other =
+parseFloat(document.getElementById("other_charge").value)||0;
+
+let discount =
+parseFloat(document.getElementById("discount").value)||0;
+
+let total =
+consultation+medicine+lab+other-discount;
+
+document.getElementById("total_amount").value=total;
+
+}
+
+document.querySelectorAll("input").forEach(function(item){
+
+item.addEventListener("input",calculateTotal);
+
+});
+
+calculateTotal();
+
+</script>
+
+{% endblock %}

@@ -876,27 +876,28 @@ def appointments():
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT
-            a.appointment_id,
-            p.full_name,
-            d.doctor_name,
-            a.appointment_date,
-            a.appointment_time,
-            a.reason,
-            a.status
+SELECT
+    a.appointment_id,
+    p.full_name,
+    d.doctor_name,
+    a.appointment_date,
+    a.appointment_time,
+    a.reason,
+    a.status,
+    b.bill_id
+FROM appointments a
 
-        FROM appointments a
+JOIN patients p
+ON a.patient_id = p.patient_id
 
-        JOIN patients p
-            ON a.patient_id = p.patient_id
+JOIN doctors d
+ON a.doctor_id = d.doctor_id
 
-        JOIN doctors d
-            ON a.doctor_id = d.doctor_id
+LEFT JOIN bills b
+ON a.appointment_id = b.appointment_id
 
-        ORDER BY a.appointment_date,
-                 a.appointment_time
-    """)
-
+ORDER BY a.appointment_id DESC
+""")
     appointments = cur.fetchall()
 
     cur.close()
@@ -1245,7 +1246,320 @@ def bills():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
-    return render_template("bills.html")
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            b.bill_id,
+            p.full_name,
+            d.doctor_name,
+            b.total_amount,
+            b.payment_status,
+            b.created_at
+        FROM bills b
+        JOIN patients p
+            ON b.patient_id = p.patient_id
+        JOIN doctors d
+            ON b.doctor_id = d.doctor_id
+        ORDER BY b.bill_id DESC
+    """)
+
+    bills = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "bills.html",
+        bills=bills
+    )
+
+
+@app.route("/add_bill/<int:appointment_id>", methods=["GET", "POST"])
+def add_bill(appointment_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # Load appointment details
+    cur.execute("""
+        SELECT
+            a.appointment_id,
+            p.patient_id,
+            p.full_name,
+            d.doctor_id,
+            d.doctor_name,
+            d.consultation_fee
+        FROM appointments a
+        JOIN patients p
+            ON a.patient_id = p.patient_id
+        JOIN doctors d
+            ON a.doctor_id = d.doctor_id
+        WHERE a.appointment_id=%s
+    """, (appointment_id,))
+
+    bill = cur.fetchone()
+
+    if request.method == "POST":
+
+        patient_id = bill[1]
+        doctor_id = bill[3]
+
+        consultation_fee = request.form["consultation_fee"]
+        medicine_charge = request.form["medicine_charge"]
+        lab_charge = request.form["lab_charge"]
+        other_charge = request.form["other_charge"]
+        discount = request.form["discount"]
+        total_amount = request.form["total_amount"]
+        payment_status = request.form["payment_status"]
+
+        # Check if bill already exists
+        cur.execute("""
+            SELECT bill_id
+            FROM bills
+            WHERE appointment_id=%s
+        """, (appointment_id,))
+
+        existing = cur.fetchone()
+
+        if existing:
+
+            cur.close()
+            conn.close()
+
+            return render_template(
+                "add_bill.html",
+                bill=bill,
+                error="Bill already generated for this appointment."
+            )
+
+        # Save Bill
+        cur.execute("""
+            INSERT INTO bills
+            (
+                patient_id,
+                doctor_id,
+                appointment_id,
+                consultation_fee,
+                medicine_charge,
+                lab_charge,
+                other_charge,
+                discount,
+                total_amount,
+                payment_status
+            )
+            VALUES
+            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """,
+        (
+            patient_id,
+            doctor_id,
+            appointment_id,
+            consultation_fee,
+            medicine_charge,
+            lab_charge,
+            other_charge,
+            discount,
+            total_amount,
+            payment_status
+        ))
+
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return redirect(url_for("bills"))
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "add_bill.html",
+        bill=bill
+    )
+
+
+@app.route("/view_bill/<int:bill_id>")
+def view_bill(bill_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            b.bill_id,
+            p.full_name,
+            d.doctor_name,
+            a.appointment_date,
+            b.consultation_fee,
+            b.medicine_charge,
+            b.lab_charge,
+            b.other_charge,
+            b.discount,
+            b.total_amount,
+            b.payment_status,
+            b.created_at
+        FROM bills b
+        JOIN patients p
+            ON b.patient_id = p.patient_id
+        JOIN doctors d
+            ON b.doctor_id = d.doctor_id
+        JOIN appointments a
+            ON b.appointment_id = a.appointment_id
+        WHERE b.bill_id=%s
+    """, (bill_id,))
+
+    bill = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "view_bill.html",
+        bill=bill
+    )
+
+
+@app.route("/edit_bill/<int:bill_id>", methods=["GET", "POST"])
+def edit_bill(bill_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    if request.method == "POST":
+
+        medicine_charge = request.form["medicine_charge"]
+        lab_charge = request.form["lab_charge"]
+        other_charge = request.form["other_charge"]
+        discount = request.form["discount"]
+        payment_status = request.form["payment_status"]
+
+        # Get consultation fee
+        cur.execute("""
+            SELECT consultation_fee
+            FROM bills
+            WHERE bill_id=%s
+        """, (bill_id,))
+
+        consultation_fee = float(cur.fetchone()[0])
+
+        total_amount = (
+            consultation_fee
+            + float(medicine_charge)
+            + float(lab_charge)
+            + float(other_charge)
+            - float(discount)
+        )
+
+        cur.execute("""
+            UPDATE bills
+            SET
+                medicine_charge=%s,
+                lab_charge=%s,
+                other_charge=%s,
+                discount=%s,
+                total_amount=%s,
+                payment_status=%s
+            WHERE bill_id=%s
+        """,
+        (
+            medicine_charge,
+            lab_charge,
+            other_charge,
+            discount,
+            total_amount,
+            payment_status,
+            bill_id
+        ))
+
+        conn.commit()
+
+        cur.close()
+        conn.close()
+
+        return redirect(url_for("bills"))
+
+    cur.execute("""
+    SELECT
+        a.appointment_id,
+        p.patient_id,
+        p.full_name,
+        d.doctor_id,
+        d.doctor_name,
+        b.consultation_fee,
+        b.medicine_charge,
+        b.lab_charge,
+        b.other_charge,
+        b.discount,
+        b.total_amount,
+        b.payment_status
+    FROM bills b
+
+    JOIN patients p
+        ON b.patient_id = p.patient_id
+
+    JOIN doctors d
+        ON b.doctor_id = d.doctor_id
+
+    JOIN appointments a
+        ON b.appointment_id = a.appointment_id
+
+    WHERE b.bill_id=%s
+""", (bill_id,))
+    bill = cur.fetchone()
+
+    cur.close()
+    conn.close()
+
+    return render_template(
+        "edit_bill.html",
+        bill=bill
+    )
+
+
+@app.route("/delete_bill/<int:bill_id>")
+def delete_bill(bill_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "Admin":
+        return redirect(url_for("login"))
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        DELETE FROM bills
+        WHERE bill_id=%s
+    """, (bill_id,))
+
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return redirect(url_for("bills"))
 
  
 @app.route("/logout")
