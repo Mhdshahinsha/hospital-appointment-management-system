@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+ {% extends "base.html" %}
 
 {% block title %}
 Doctor Dashboard
@@ -32,7 +32,7 @@ Doctor Dashboard
 
                 <h5>Today's Appointments</h5>
 
-                <h2>8</h2>
+                <h2>{{ today_count }}</h2>
 
             </div>
 
@@ -44,7 +44,7 @@ Doctor Dashboard
 
                 <h5>My Patients</h5>
 
-                <h2>145</h2>
+                <h2>{{ patient_count }}</h2>
 
             </div>
 
@@ -56,7 +56,7 @@ Doctor Dashboard
 
                 <h5>Pending Cases</h5>
 
-                <h2>5</h2>
+                <h2>{{ pending_count }}</h2>
 
             </div>
 
@@ -68,7 +68,7 @@ Doctor Dashboard
 
                 <h5>Completed Today</h5>
 
-                <h2>3</h2>
+                <h2>{{ completed_today }}</h2>
 
             </div>
 
@@ -106,136 +106,162 @@ Doctor Dashboard
 
             <tbody>
 
-                <tr>
+{% if appointments %}
 
-                    <td>Rahul</td>
+    {% for appointment in appointments %}
 
-                    <td>10:00 AM</td>
+    <tr>
 
-                    <td>Fever</td>
+        <!-- Patient -->
+        <td>{{ appointment[0] }}</td>
 
-                    <td>
+        <!-- Time -->
+        <td>{{ appointment[1] }}</td>
+        
+        <td>{{ appointment[2] }}</td>  
+        <!-- Status -->
+        <td>
 
-                        <span class="badge bg-warning text-dark">
+            {% if appointment[3] == "Pending" %}
 
-                            Waiting
+                <span class="badge bg-warning text-dark">
 
-                        </span>
+                    Pending
 
-                    </td>
+                </span>
 
-                </tr>
+            {% elif appointment[3] == "Confirmed" %}
 
-                <tr>
+                <span class="badge bg-info">
 
-                    <td>Anjali</td>
+                    Confirmed
 
-                    <td>11:30 AM</td>
+                </span>
 
-                    <td>Headache</td>
+            {% elif appointment[3] == "Completed" %}
 
-                    <td>
+                <span class="badge bg-success">
 
-                        <span class="badge bg-success">
+                    Completed
 
-                            Completed
+                </span>
 
-                        </span>
+            {% elif appointment[3] == "Cancelled" %}
 
-                    </td>
+                <span class="badge bg-danger">
 
-                </tr>
+                    Cancelled
 
-                <tr>
+                </span>
 
-                    <td>Arun</td>
+            {% else %}
 
-                    <td>02:00 PM</td>
+                <span class="badge bg-secondary">
 
-                    <td>General Checkup</td>
+                    {{ appointment[3] }}
 
-                    <td>
+                </span>
 
-                        <span class="badge bg-warning text-dark">
+            {% endif %}
 
-                            Waiting
+        </td>
 
-                        </span>
+    </tr>
 
-                    </td>
+    {% endfor %}
 
-                </tr>
+{% else %}
 
-            </tbody>
+<tr>
 
+    <td colspan="3" class="text-center">
+
+        No Appointments Today
+
+    </td>
+
+</tr>
+
+{% endif %}
+</tbody>
         </table>
 
     </div>
 
     <!-- Quick Actions -->
+<!-- Quick Actions -->
 
-    <div class="mt-5">
+<div class="mt-5">
 
-        <h3 class="text-white mb-4">
+    <h3 class="text-white mb-4">
 
-            Quick Actions
+        Quick Actions
 
-        </h3>
+    </h3>
 
-        <div class="row g-3">
+    <div class="row g-3">
 
-            <div class="col-md-3">
+        <!-- View Appointments -->
+        <div class="col-lg-3 col-md-6">
 
-                <button class="btn btn-login w-100">
+            <a href="{{ url_for('doctor_appointments') }}"
+               class="btn btn-login w-100">
 
-                    <i class="bi bi-calendar-check-fill"></i>
+                <i class="bi bi-calendar-check-fill"></i>
 
-                    View Appointments
+                View Appointments
 
-                </button>
-
-            </div>
-
-            <div class="col-md-3">
-
-                <button class="btn btn-login w-100">
-
-                    <i class="bi bi-person-lines-fill"></i>
-
-                    My Patients
-
-                </button>
-
-            </div>
-
-            <div class="col-md-3">
-
-                <button class="btn btn-login w-100">
-
-                    <i class="bi bi-clock-history"></i>
-
-                    My Schedule
-
-                </button>
-
-            </div>
-
-            <div class="col-md-3">
-
-                <a href="{{ url_for('logout') }}" class="btn btn-login w-100">
-
-                    <i class="bi bi-box-arrow-right"></i>
-
-                    Logout
-
-                </a>
-
-            </div>
+            </a>
 
         </div>
 
+        <!-- My Patients -->
+        <div class="col-lg-3 col-md-6">
+
+            <a href="{{ url_for('doctor_patients') }}"
+               class="btn btn-login w-100">
+
+                <i class="bi bi-person-lines-fill"></i>
+
+                My Patients
+
+            </a>
+
+        </div>
+
+        <!-- My Schedule -->
+        <div class="col-lg-3 col-md-6">
+
+            <a href="{{ url_for('doctor_schedule') }}"
+               class="btn btn-login w-100">
+
+                <i class="bi bi-clock-history"></i>
+
+                My Schedule
+
+            </a>
+
+        </div>
+
+        <!-- Logout -->
+        <div class="col-lg-3 col-md-6">
+
+            <a href="{{ url_for('logout') }}"
+               class="btn btn-login w-100">
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </div>
+      
     </div>
 
 </div>
 
 {% endblock %}
+

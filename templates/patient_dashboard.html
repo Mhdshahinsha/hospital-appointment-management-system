@@ -72,7 +72,7 @@ Patient Dashboard
 
                 <h5>Pending Bills</h5>
 
-                <h2>₹1,500</h2>
+                <h2>{{ pending_bill_amount }}</h2>
 
             </div>
 
@@ -217,14 +217,14 @@ Patient Dashboard
 
         <div class="col-md-4 mb-3">
 
-            <button class="btn btn-login w-100">
+            <a href="{{ url_for('patient_bills') }}"
+               class="btn btn-login">
 
                 <i class="bi bi-receipt-cutoff"></i>
 
                 My Bills
 
-            </button>
-
+            </a>
         </div>
 
         <div class="col-md-4 mb-3">

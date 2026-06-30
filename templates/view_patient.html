@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}
+Patient Details
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="welcome-container">
+
+        <h1 class="welcome-title">
+
+            Patient Details
+
+        </h1>
+
+        <p class="welcome-subtitle">
+
+            Complete Patient Information
+
+        </p>
+
+    </div>
+
+    <div class="d-flex justify-content-center">
+
+        <div class="add-doctor-card">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Patient ID
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ patient[0] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Full Name
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ patient[1] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Email
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ patient[2] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Phone
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ patient[3] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Gender
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ patient[4] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Age
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ patient[5] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Address
+
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="2"
+                        readonly>{{ patient[6] }}</textarea>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <h4 class="text-white mb-3">
+
+                Appointment History
+
+            </h4>
+
+            <table class="table table-dark table-hover">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for row in history %}
+
+                    <tr>
+
+                        <td>{{ row[0] }}</td>
+
+                        <td>{{ row[1] }}</td>
+
+                        <td>{{ row[2] }}</td>
+
+                        <td>{{ row[3] }}</td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            <div class="text-center mt-4">
+
+                <a href="{{ url_for('doctor_patients') }}"
+                   class="register-link">
+
+                    ← Back to My Patients
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

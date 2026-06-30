@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}
+Medical Record
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="welcome-container">
+
+        <h1 class="welcome-title">
+
+            Medical Record
+
+        </h1>
+
+        <p class="welcome-subtitle">
+
+            Patient Consultation Details
+
+        </p>
+
+    </div>
+
+    <div class="d-flex justify-content-center">
+
+        <div class="add-doctor-card">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Record ID
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ record[0] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Patient
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ record[1] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Doctor
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ record[2] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-12 mb-3">
+
+                    <label class="form-label">
+
+                        Diagnosis
+
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="3"
+                        readonly>{{ record[3] }}</textarea>
+
+                </div>
+
+                <div class="col-md-12 mb-3">
+
+                    <label class="form-label">
+
+                        Prescription
+
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="3"
+                        readonly>{{ record[4] }}</textarea>
+
+                </div>
+
+                <div class="col-md-12 mb-3">
+
+                    <label class="form-label">
+
+                        Treatment
+
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="3"
+                        readonly>{{ record[5] }}</textarea>
+
+                </div>
+
+                <div class="col-md-12 mb-3">
+
+                    <label class="form-label">
+
+                        Doctor Notes
+
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="4"
+                        readonly>{{ record[6] }}</textarea>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">
+
+                        Created On
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ record[7] }}"
+                        readonly>
+
+                </div>
+
+            </div>
+
+            <div class="text-center mt-4">
+
+                <a href="{{ url_for('doctor_appointments') }}"
+                   class="register-link">
+
+                    ← Back to Appointments
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

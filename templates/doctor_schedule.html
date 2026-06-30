@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Schedule
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="welcome-container">
+
+        <h1 class="welcome-title">
+
+            My Schedule
+
+        </h1>
+
+        <p class="welcome-subtitle">
+
+            Doctor Availability & Appointment Summary
+
+        </p>
+
+    </div>
+
+    <div class="d-flex justify-content-center">
+
+        <div class="add-doctor-card">
+
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Doctor
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ doctor[0] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Department
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ doctor[1] }}"
+                        readonly>
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Available Days
+
+                    </label>
+
+                    <textarea
+                        class="form-control"
+                        rows="3"
+                        readonly>{{ doctor[2] }}</textarea>
+
+                </div>
+
+                <div class="col-md-6 mb-4">
+
+                    <label class="form-label">
+
+                        Available Time
+
+                    </label>
+
+                    <input
+                        class="form-control"
+                        value="{{ doctor[3] }}"
+                        readonly>
+
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="row text-center">
+
+                <div class="col-md-6">
+
+                    <div class="dashboard-card">
+
+                        <h5>
+
+                            Today's Appointments
+
+                        </h5>
+
+                        <h2>
+
+                            {{ today_count }}
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="dashboard-card">
+
+                        <h5>
+
+                            Upcoming Appointments
+
+                        </h5>
+
+                        <h2>
+
+                            {{ upcoming_count }}
+
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="text-center mt-4">
+
+                <a href="{{ url_for('doctor_dashboard') }}"
+                   class="register-link">
+
+                    ← Back to Dashboard
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
